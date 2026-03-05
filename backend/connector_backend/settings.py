@@ -9,7 +9,6 @@ Production-ready configuration for:
 - CORS, security headers, and App Store compliance defaults
 """
 
-import os
 from datetime import timedelta
 from pathlib import Path
 

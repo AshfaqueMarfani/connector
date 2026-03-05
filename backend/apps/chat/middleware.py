@@ -34,7 +34,7 @@ def get_user_from_token(token_str):
         logger.warning(f"WebSocket auth failed – invalid token: {e}")
         return AnonymousUser()
     except User.DoesNotExist:
-        logger.warning(f"WebSocket auth failed – user not found for token")
+        logger.warning("WebSocket auth failed \u2013 user not found for token")
         return AnonymousUser()
     except Exception as e:
         logger.error(f"WebSocket auth unexpected error: {e}")

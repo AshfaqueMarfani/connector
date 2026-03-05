@@ -11,14 +11,11 @@ Chat flow:
 
 import json
 import logging
-from datetime import datetime
 
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from django.contrib.auth.models import AnonymousUser
 from django.utils import timezone
-
-from apps.moderation.models import Block
 
 from .models import ChatRoom, Message
 

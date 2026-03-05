@@ -5,7 +5,6 @@ Health check views for load balancer / monitoring.
 from django.db import connection
 from django.http import JsonResponse
 from django.views import View
-from django.conf import settings
 
 
 class HealthCheckView(View):

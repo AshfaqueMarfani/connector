@@ -79,7 +79,6 @@ def find_matches_for_status(self, status_id: str):
     from django.contrib.gis.db.models.functions import Distance
     from django.contrib.gis.measure import D
 
-    from apps.chat.models import Notification
     from apps.locations.models import UserLocation
     from apps.matching.models import AIMatchResult
     from apps.matching.services import AIService

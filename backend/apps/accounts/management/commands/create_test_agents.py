@@ -14,8 +14,6 @@ Run:
   docker-compose -f docker-compose.prod.yml run --rm backend python manage.py create_test_agents
 """
 
-import random
-
 from django.contrib.gis.geos import Point
 from django.core.management.base import BaseCommand
 from django.utils import timezone
@@ -31,7 +29,11 @@ AGENTS = [
         "email": "agent1@otaskflow.com",
         "full_name": "Aisha Khan",
         "account_type": "individual",
-        "bio": "Community organizer & volunteer. Looking to connect with locals who need help with groceries, tutoring, or daily errands.",
+        "bio": (
+            "Community organizer & volunteer. Looking to connect"
+            " with locals who need help with groceries,"
+            " tutoring, or daily errands."
+        ),
         "skills": ["tutoring", "cooking", "first aid", "translation"],
         "interests": ["food assistance", "education", "mentorship"],
         "tags": ["volunteer", "education", "community"],
@@ -45,7 +47,11 @@ AGENTS = [
         "email": "agent2@otaskflow.com",
         "full_name": "Hassan Auto Workshop",
         "account_type": "business",
-        "bio": "Trusted auto repair & roadside assistance in Clifton. 15 years serving the community. Fair prices, honest work.",
+        "bio": (
+            "Trusted auto repair & roadside assistance in"
+            " Clifton. 15 years serving the community."
+            " Fair prices, honest work."
+        ),
         "skills": [],
         "interests": [],
         "tags": ["auto repair", "mechanic", "roadside assistance", "towing"],
@@ -59,7 +65,11 @@ AGENTS = [
         "email": "agent3@otaskflow.com",
         "full_name": "Karachi Relief Foundation",
         "account_type": "ngo",
-        "bio": "Non-profit providing food, shelter, and medical aid to vulnerable communities across Karachi since 2018.",
+        "bio": (
+            "Non-profit providing food, shelter, and medical"
+            " aid to vulnerable communities across Karachi"
+            " since 2018."
+        ),
         "skills": [],
         "interests": [],
         "tags": ["food", "shelter", "medical", "disaster relief", "clothing"],
@@ -87,7 +97,11 @@ AGENTS = [
         "email": "agent5@otaskflow.com",
         "full_name": "Sara's Kitchen & Catering",
         "account_type": "business",
-        "bio": "Home-style catering for events, offices, and families. Pakistani, continental & Chinese cuisine. Halal certified.",
+        "bio": (
+            "Home-style catering for events, offices, and"
+            " families. Pakistani, continental & Chinese"
+            " cuisine. Halal certified."
+        ),
         "skills": [],
         "interests": [],
         "tags": ["restaurant", "catering", "food", "halal"],
