@@ -31,9 +31,9 @@ ENV DJANGO_SETTINGS_MODULE=connector_backend.settings
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq5 \
     gdal-bin \
-    libgdal34 \
-    libgeos-c1v5 \
-    libproj25 \
+    libgdal-dev \
+    libgeos-dev \
+    libproj-dev \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
