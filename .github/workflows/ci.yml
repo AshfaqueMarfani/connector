@@ -66,7 +66,11 @@ jobs:
           restore-keys: ${{ runner.os }}-pip-
 
       - name: Install Python dependencies
-        run: pip install -r requirements.txt
+        run: |
+          pip install -r requirements.txt
+          # Install GDAL Python bindings matching system libgdal version
+          GDAL_VERSION=$(gdal-config --version)
+          pip install GDAL==${GDAL_VERSION}
 
       - name: Run linting (flake8)
         run: flake8 apps/ connector_backend/ --max-line-length=120 --exclude=migrations

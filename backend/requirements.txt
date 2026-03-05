@@ -13,7 +13,9 @@ psycopg2-binary==2.9.10
 django-environ==0.11.2
 
 # Geospatial
-GDAL==3.10.1
+# GDAL Python bindings — version must match system libgdal.
+# In Docker: installed via Dockerfile. In CI: installed dynamically.
+# Do NOT pin a version here.
 
 # Django Channels (WebSockets)
 channels==4.2.0
