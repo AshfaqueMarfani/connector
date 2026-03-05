@@ -1,0 +1,38 @@
+[
+  {
+    "name": "Al-Khidmat Foundation Karachi",
+    "bio": "Providing food, shelter, and emergency relief services across Karachi.",
+    "tags": ["food", "shelter", "disaster relief"],
+    "latitude": 24.8615,
+    "longitude": 67.0099
+  },
+  {
+    "name": "Edhi Foundation Center",
+    "bio": "Free ambulance, burial, and shelter services for all.",
+    "tags": ["medical", "shelter", "emergency"],
+    "latitude": 24.8560,
+    "longitude": 66.9905
+  },
+  {
+    "name": "Saylani Welfare Trust",
+    "bio": "Free food distribution and education programs.",
+    "tags": ["food", "education"],
+    "latitude": 24.8710,
+    "longitude": 67.0300
+  },
+  {
+    "name": "Community Hardware Store",
+    "email": "hardware@example.com",
+    "bio": "Affordable tools and building materials for local contractors.",
+    "tags": ["hardware store", "tools"],
+    "latitude": 24.8550,
+    "longitude": 67.0150
+  },
+  {
+    "name": "Karachi Free Legal Aid Clinic",
+    "bio": "Pro bono legal services for underserved communities.",
+    "tags": ["legal aid", "counseling"],
+    "latitude": 24.8680,
+    "longitude": 67.0250
+  }
+]

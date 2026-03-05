@@ -1,0 +1,172 @@
+version: "3.9"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# PRODUCTION Docker Compose – Connector Backend (social.otaskflow.com / Hostinger)
+# Usage: docker-compose -f docker-compose.prod.yml up -d --build
+# ═══════════════════════════════════════════════════════════════════════════
+
+services:
+  # ── PostgreSQL + PostGIS ──────────────────────────────────────────
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: connector_db_prod
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - backend_network
+
+  # ── Redis (Channels + Celery) ─────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: connector_redis_prod
+    restart: always
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - backend_network
+
+  # ── Django Backend (Daphne ASGI) ──────────────────────────────────
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: connector_backend_prod
+    restart: always
+    env_file:
+      - .env.production
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+    volumes:
+      - static_data:/app/staticfiles
+      - media_data:/app/media
+      - log_data:/app/logs
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: >
+      sh -c "
+        python manage.py migrate --noinput &&
+        python manage.py collectstatic --noinput 2>/dev/null || true &&
+        daphne -b 0.0.0.0 -p 8000 connector_backend.asgi:application
+      "
+    networks:
+      - backend_network
+
+  # ── Celery Worker ─────────────────────────────────────────────────
+  celery_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: connector_celery_worker_prod
+    restart: always
+    env_file:
+      - .env.production
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+    volumes:
+      - media_data:/app/media
+      - log_data:/app/logs
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: celery -A connector_backend worker -l warning --concurrency=4 -O fair
+    networks:
+      - backend_network
+
+  # ── Celery Beat (Periodic Tasks) ──────────────────────────────────
+  celery_beat:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: connector_celery_beat_prod
+    restart: always
+    env_file:
+      - .env.production
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+    volumes:
+      - log_data:/app/logs
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: celery -A connector_backend beat -l warning --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    networks:
+      - backend_network
+
+  # ── Nginx Reverse Proxy ───────────────────────────────────────────
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: connector_nginx_prod
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - static_data:/app/staticfiles:ro
+      - media_data:/app/media:ro
+      - certbot_conf:/etc/letsencrypt:ro
+      - certbot_www:/var/www/certbot:ro
+    depends_on:
+      - backend
+    networks:
+      - backend_network
+
+  # ── Certbot (Let's Encrypt SSL auto-renewal) ─────────────────────
+  certbot:
+    image: certbot/certbot:latest
+    container_name: connector_certbot
+    volumes:
+      - certbot_conf:/etc/letsencrypt
+      - certbot_www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot --quiet; sleep 12h & wait $${!}; done;'"
+    networks:
+      - backend_network
+
+volumes:
+  postgres_data:
+  redis_data:
+  static_data:
+  media_data:
+  log_data:
+  certbot_conf:
+  certbot_www:
+
+networks:
+  backend_network:
+    driver: bridge

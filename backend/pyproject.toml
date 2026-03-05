@@ -1,0 +1,19 @@
+[tool.black]
+line-length = 99
+target-version = ['py312']
+exclude = '''
+/(
+    migrations
+    | __pycache__
+    | venv
+    | .venv
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 99
+known_django = ["django"]
+known_third_party = ["rest_framework", "celery", "channels"]
+known_first_party = ["apps"]
+sections = ["FUTURE", "STDLIB", "THIRDPARTY", "DJANGO", "FIRSTPARTY", "LOCALFOLDER"]

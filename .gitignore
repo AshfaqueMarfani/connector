@@ -1,0 +1,62 @@
+# ═══════════════════════════════════════════════════════════════════
+# Connector — Root .gitignore
+# ═══════════════════════════════════════════════════════════════════
+
+# ── Environment & secrets ────────────────────────────────────────
+.env
+.env.*
+!.env.example
+!.env.production.template
+*.env.local
+
+# ── Python ───────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+eggs/
+*.egg
+.Python
+venv/
+env/
+.venv/
+
+# ── Django ───────────────────────────────────────────────────────
+db.sqlite3
+db.sqlite3-journal
+backend/staticfiles/
+backend/media/
+backend/logs/*.log
+
+# ── Flutter / Dart ───────────────────────────────────────────────
+frontend/.dart_tool/
+frontend/.packages
+frontend/.pub-cache/
+frontend/build/
+*.iml
+
+# ── Docker ───────────────────────────────────────────────────────
+docker-compose.override.yml
+
+# ── IDE ──────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ── OS ───────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Testing ──────────────────────────────────────────────────────
+.pytest_cache/
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
