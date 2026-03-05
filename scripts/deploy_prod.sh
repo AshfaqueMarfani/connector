@@ -60,10 +60,10 @@ if [ ! -d "/etc/letsencrypt/live/$API_DOMAIN" ] && ! docker volume inspect conne
     echo ""
 
     # Start nginx temporarily for ACME challenge (HTTP only)
-    $DC -f docker-compose.prod.yml up -d nginx
+    docker-compose -f docker-compose.prod.yml up -d nginx
 
     # Request certificate
-    $DC -f docker-compose.prod.yml run --rm certbot certbot certonly \
+    docker-compose -f docker-compose.prod.yml run --rm certbot certbot certonly \
         --webroot \
         -w /var/www/certbot \
         --email "$EMAIL" \
@@ -73,18 +73,18 @@ if [ ! -d "/etc/letsencrypt/live/$API_DOMAIN" ] && ! docker volume inspect conne
         -d "$DOMAIN"
 
     # Stop nginx so it restarts with SSL config
-    $DC -f docker-compose.prod.yml stop nginx
+    docker-compose -f docker-compose.prod.yml stop nginx
     echo "✅ SSL certificate obtained"
 fi
 
 # ── Build & Deploy ───────────────────────────────────────────────
 echo ""
 echo "Building production images..."
-$DC -f docker-compose.prod.yml build
+docker-compose -f docker-compose.prod.yml build
 
 echo ""
 echo "Starting production services..."
-$DC -f docker-compose.prod.yml up -d
+docker-compose -f docker-compose.prod.yml up -d
 
 echo ""
 echo "Waiting for services to be healthy..."
@@ -92,11 +92,11 @@ sleep 20
 
 echo ""
 echo "Running database migrations..."
-$DC -f docker-compose.prod.yml run --rm backend python manage.py migrate --noinput
+docker-compose -f docker-compose.prod.yml run --rm backend python manage.py migrate --noinput
 
 echo ""
 echo "Collecting static files..."
-$DC -f docker-compose.prod.yml run --rm backend python manage.py collectstatic --noinput
+docker-compose -f docker-compose.prod.yml run --rm backend python manage.py collectstatic --noinput
 
 # ── Health check ─────────────────────────────────────────────────
 echo ""
@@ -107,7 +107,7 @@ if [ "$HTTP_STATUS" = "200" ]; then
     echo "✅ Health check passed (HTTP 200)"
 else
     echo "⚠️  Health check returned HTTP $HTTP_STATUS"
-    echo "   Check logs: $DC -f docker-compose.prod.yml logs backend"
+    echo "   Check logs: docker-compose -f docker-compose.prod.yml logs backend"
 fi
 
 echo ""
@@ -125,8 +125,8 @@ echo ""
 echo "  SSL:       Let's Encrypt (auto-renews via Certbot container)"
 echo ""
 echo "  Management:"
-echo "    Logs:      $DC -f docker-compose.prod.yml logs -f"
-echo "    Stop:      $DC -f docker-compose.prod.yml down"
-echo "    Restart:   $DC -f docker-compose.prod.yml restart"
-echo "    SSL renew: $DC -f docker-compose.prod.yml run --rm certbot certbot renew"
+echo "    Logs:      docker-compose -f docker-compose.prod.yml logs -f"
+echo "    Stop:      docker-compose -f docker-compose.prod.yml down"
+echo "    Restart:   docker-compose -f docker-compose.prod.yml restart"
+echo "    SSL renew: docker-compose -f docker-compose.prod.yml run --rm certbot certbot renew"
 echo "═══════════════════════════════════════════════════════"
