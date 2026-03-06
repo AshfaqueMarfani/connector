@@ -3,8 +3,9 @@ Serializers for the moderation app.
 Handles Block and Report creation/retrieval.
 """
 
-from django.contrib.auth import get_user_model
 from rest_framework import serializers
+
+from django.contrib.auth import get_user_model
 
 from .models import Block, Report
 

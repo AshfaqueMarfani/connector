@@ -14,6 +14,7 @@ import logging
 from datetime import timedelta
 
 from celery import shared_task
+
 from django.utils import timezone
 
 logger = logging.getLogger("apps")
@@ -33,8 +34,8 @@ URGENCY_RADIUS = {
 @shared_task(bind=True, max_retries=3, default_retry_delay=30)
 def parse_status_intent(self, status_id: str):
     """Parse a status with AI and update ``ai_parsed_intent`` / ``ai_tags``."""
-    from apps.statuses.models import Status
     from apps.matching.services import AIService
+    from apps.statuses.models import Status
 
     try:
         status = Status.objects.get(id=status_id, is_active=True)
