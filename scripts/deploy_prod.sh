@@ -48,6 +48,10 @@ fi
 
 echo "✅ Production environment file validated"
 
+# ── Symlink .env so docker-compose can interpolate variables ─────
+ln -sf .env.production .env
+echo "✅ Linked .env → .env.production for Docker Compose"
+
 # ── Ensure swap exists (GDAL build needs >1 GB) ─────────────────
 if [ ! -f /swapfile ]; then
     echo "📦 Creating 2 GB swap file for Docker builds..."
