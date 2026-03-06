@@ -1,8 +1,6 @@
-version: "3.9"
-
 # ═══════════════════════════════════════════════════════════════════════════
-# PRODUCTION Docker Compose – Connector Backend (social.otaskflow.com / Hostinger)
-# Usage: docker-compose -f docker-compose.prod.yml up -d --build
+# PRODUCTION Docker Compose – Connector Backend (social.otaskflow.com)
+# Usage: docker compose -f docker-compose.prod.yml up -d --build
 # ═══════════════════════════════════════════════════════════════════════════
 
 services:
@@ -92,7 +90,7 @@ services:
       CELERY_BROKER_URL: redis://redis:6379/1
       CELERY_RESULT_BACKEND: redis://redis:6379/2
     volumes:
-      - media_data:/app/media
+      - /opt/Connector/backend/media:/app/media
       - log_data:/app/logs
     depends_on:
       db:
