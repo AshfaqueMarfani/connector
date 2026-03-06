@@ -5,9 +5,8 @@ Handles location updates and ensures obfuscation compliance
 for private profiles in all outbound data.
 """
 
-from rest_framework import serializers
-
 from django.contrib.gis.geos import Point
+from rest_framework import serializers
 
 from .models import LocationHistory, UserLocation
 
