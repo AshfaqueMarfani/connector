@@ -15,12 +15,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 ENV GDAL_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/libgdal.so
 ENV GEOS_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/libgeos_c.so
+# Help pip find gdal-config for building GDAL bindings
+ENV GDAL_CONFIG=/usr/bin/gdal-config
 
 WORKDIR /app
 COPY requirements.txt .
-RUN pip install --no-cache-dir --upgrade pip && \
+# Install deps + GDAL bindings; use --no-build-isolation to reuse
+# already-installed setuptools/numpy from requirements and cap memory usage.
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel numpy && \
     pip install --no-cache-dir -r requirements.txt && \
-    pip install --no-cache-dir GDAL==$(gdal-config --version)
+    GDAL_V=$(gdal-config --version) && \
+    pip install --no-cache-dir --no-build-isolation "GDAL==${GDAL_V}"
 
 # ── Final stage ──────────────────────────────────────────────────────
 FROM python:3.12-slim

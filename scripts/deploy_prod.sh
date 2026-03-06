@@ -48,6 +48,20 @@ fi
 
 echo "✅ Production environment file validated"
 
+# ── Ensure swap exists (GDAL build needs >1 GB) ─────────────────
+if [ ! -f /swapfile ]; then
+    echo "📦 Creating 2 GB swap file for Docker builds..."
+    sudo fallocate -l 2G /swapfile
+    sudo chmod 600 /swapfile
+    sudo mkswap /swapfile
+    sudo swapon /swapfile
+    echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+    echo "✅ Swap enabled"
+else
+    sudo swapon /swapfile 2>/dev/null || true
+    echo "✅ Swap already configured"
+fi
+
 # ── Ensure Docker volumes exist ──────────────────────────────────
 docker volume create --name=connector_certbot_conf 2>/dev/null || true
 docker volume create --name=connector_certbot_www 2>/dev/null || true
