@@ -10,12 +10,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Block, Report
-from .serializers import (
-    BlockCreateSerializer,
-    BlockSerializer,
-    ReportCreateSerializer,
-    ReportSerializer,
-)
+from .serializers import BlockCreateSerializer, BlockSerializer, ReportCreateSerializer, ReportSerializer
 
 logger = logging.getLogger("apps")
 

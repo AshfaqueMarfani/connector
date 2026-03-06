@@ -19,11 +19,7 @@ from apps.moderation.models import Block
 from apps.profiles.serializers import ProfilePublicSerializer
 
 from .models import LocationHistory, UserLocation
-from .serializers import (
-    LocationUpdateSerializer,
-    UserLocationOwnerSerializer,
-    UserLocationSerializer,
-)
+from .serializers import LocationUpdateSerializer, UserLocationOwnerSerializer, UserLocationSerializer
 
 logger = logging.getLogger("apps")
 User = get_user_model()
