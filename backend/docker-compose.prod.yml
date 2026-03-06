@@ -56,9 +56,11 @@ services:
       REDIS_URL: redis://redis:6379/0
       CELERY_BROKER_URL: redis://redis:6379/1
       CELERY_RESULT_BACKEND: redis://redis:6379/2
+    ports:
+      - "127.0.0.1:8001:8000"
     volumes:
-      - static_data:/app/staticfiles
-      - media_data:/app/media
+      - /opt/Connector/backend/staticfiles:/app/staticfiles
+      - /opt/Connector/backend/media:/app/media
       - log_data:/app/logs
     depends_on:
       db:
@@ -127,45 +129,10 @@ services:
     networks:
       - backend_network
 
-  # ── Nginx Reverse Proxy ───────────────────────────────────────────
-  nginx:
-    build:
-      context: ./nginx
-      dockerfile: Dockerfile
-    container_name: connector_nginx_prod
-    restart: always
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - static_data:/app/staticfiles:ro
-      - media_data:/app/media:ro
-      - certbot_conf:/etc/letsencrypt:ro
-      - certbot_www:/var/www/certbot:ro
-    depends_on:
-      - backend
-    networks:
-      - backend_network
-
-  # ── Certbot (Let's Encrypt SSL auto-renewal) ─────────────────────
-  certbot:
-    image: certbot/certbot:latest
-    container_name: connector_certbot
-    volumes:
-      - certbot_conf:/etc/letsencrypt
-      - certbot_www:/var/www/certbot
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot --quiet; sleep 12h & wait $${!}; done;'"
-    networks:
-      - backend_network
-
 volumes:
   postgres_data:
   redis_data:
-  static_data:
-  media_data:
   log_data:
-  certbot_conf:
-  certbot_www:
 
 networks:
   backend_network:

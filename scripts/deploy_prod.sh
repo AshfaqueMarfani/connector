@@ -1,22 +1,25 @@
 #!/bin/bash
 # ═══════════════════════════════════════════════════════════════════
-# Connector — Production Deployment Script (social.otaskflow.com / Hostinger)
+# Connector — Production Deployment Script (social.otaskflow.com)
 # Usage: chmod +x scripts/deploy_prod.sh && ./scripts/deploy_prod.sh
 #
+# This script deploys alongside an EXISTING nginx + other Django app on the VPS.
+# It uses the HOST nginx to route social.otaskflow.com → Connector backend:8001.
+#
 # Prerequisites:
-#   1. Hostinger VPS (Ubuntu 22.04+, 2 GB RAM minimum)
-#   2. Docker & Docker Compose installed on the VPS
-#   3. DNS A records (in Hostinger DNS Zone Editor):
+#   1. VPS (Ubuntu 22.04+) with Docker, Docker Compose, nginx already installed
+#   2. DNS A records:
 #        social.otaskflow.com       → 104.248.171.137
 #        api.social.otaskflow.com   → 104.248.171.137
-#   4. .env.production configured (see .env.production.template)
+#   3. .env.production configured (see .env.production.template)
 # ═══════════════════════════════════════════════════════════════════
 
 set -e
 
+PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 DOMAIN="social.otaskflow.com"
 API_DOMAIN="api.social.otaskflow.com"
-EMAIL="support@otaskflow.com"   # Let's Encrypt registration email
+EMAIL="support@otaskflow.com"
 
 # Use modern "docker compose" plugin syntax (fallback to docker-compose if available)
 if docker compose version &>/dev/null; then
@@ -26,12 +29,12 @@ else
 fi
 
 echo "═══════════════════════════════════════════════════════"
-echo "  Connector — Production Deployment (social.otaskflow.com)"
-echo "  Target: Hostinger VPS"
+echo "  Connector — Production Deployment"
+echo "  Subdomain: social.otaskflow.com  (alongside existing VPS apps)"
 echo "═══════════════════════════════════════════════════════"
 echo ""
 
-cd backend
+cd "$PROJECT_ROOT/backend"
 
 # ── Pre-flight checks ────────────────────────────────────────────
 if [ ! -f .env.production ]; then
@@ -66,33 +69,20 @@ else
     echo "✅ Swap already configured"
 fi
 
-# ── Ensure Docker volumes exist ──────────────────────────────────
-docker volume create --name=connector_certbot_conf 2>/dev/null || true
-docker volume create --name=connector_certbot_www 2>/dev/null || true
+# ── Prepare host directories for static/media ────────────────────
+mkdir -p "$PROJECT_ROOT/backend/staticfiles"
+mkdir -p "$PROJECT_ROOT/backend/media"
 
-# ── SSL Certificate (Let's Encrypt via Certbot) ─────────────────
-if [ ! -d "/etc/letsencrypt/live/$API_DOMAIN" ] && ! docker volume inspect connector_certbot_conf | grep -q "CreatedAt" 2>/dev/null; then
-    echo ""
-    echo "🔒 Obtaining initial SSL certificate from Let's Encrypt..."
-    echo "   Ensure DNS A records point to this server BEFORE continuing."
-    echo ""
-
-    # Start nginx temporarily for ACME challenge (HTTP only)
-    $DC -f docker-compose.prod.yml up -d nginx
-
-    # Request certificate
-    $DC -f docker-compose.prod.yml run --rm certbot certbot certonly \
-        --webroot \
-        -w /var/www/certbot \
-        --email "$EMAIL" \
-        --agree-tos \
-        --no-eff-email \
-        -d "$API_DOMAIN" \
-        -d "$DOMAIN"
-
-    # Stop nginx so it restarts with SSL config
-    $DC -f docker-compose.prod.yml stop nginx
-    echo "✅ SSL certificate obtained"
+# ── Install host nginx config ────────────────────────────────────
+NGINX_CONF="$PROJECT_ROOT/nginx/social.otaskflow.com.conf"
+if [ -f "$NGINX_CONF" ]; then
+    echo "📦 Installing nginx server block for $API_DOMAIN..."
+    sudo cp "$NGINX_CONF" /etc/nginx/sites-available/social.otaskflow.com
+    sudo ln -sf /etc/nginx/sites-available/social.otaskflow.com /etc/nginx/sites-enabled/
+    sudo nginx -t && sudo systemctl reload nginx
+    echo "✅ Host nginx configured for $API_DOMAIN"
+else
+    echo "⚠️  Nginx config not found at $NGINX_CONF — skipping"
 fi
 
 # ── Build & Deploy ───────────────────────────────────────────────
@@ -108,18 +98,10 @@ echo ""
 echo "Waiting for services to be healthy..."
 sleep 20
 
-echo ""
-echo "Running database migrations..."
-$DC -f docker-compose.prod.yml run --rm backend python manage.py migrate --noinput
-
-echo ""
-echo "Collecting static files..."
-$DC -f docker-compose.prod.yml run --rm backend python manage.py collectstatic --noinput
-
 # ── Health check ─────────────────────────────────────────────────
 echo ""
 echo "Running health check..."
-HTTP_STATUS=$(curl -sk -o /dev/null -w "%{http_code}" "https://$API_DOMAIN/api/v1/health/" 2>/dev/null || echo "000")
+HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:8001/api/v1/health/" 2>/dev/null || echo "000")
 
 if [ "$HTTP_STATUS" = "200" ]; then
     echo "✅ Health check passed (HTTP 200)"
@@ -128,23 +110,32 @@ else
     echo "   Check logs: $DC -f docker-compose.prod.yml logs backend"
 fi
 
+# ── SSL (Let's Encrypt via host certbot) ─────────────────────────
+if [ ! -d "/etc/letsencrypt/live/$API_DOMAIN" ]; then
+    echo ""
+    echo "🔒 To enable HTTPS, run:"
+    echo "   sudo certbot --nginx -d $API_DOMAIN -d $DOMAIN"
+    echo ""
+fi
+
 echo ""
 echo "═══════════════════════════════════════════════════════"
 echo "  ✅  Production deployment complete!"
 echo ""
-echo "  Domain:    https://$DOMAIN"
-echo "  API:       https://$API_DOMAIN"
+echo "  API (HTTP):  http://$API_DOMAIN/api/v1/"
+echo "  Health:      http://$API_DOMAIN/api/v1/health/"
+echo "  Admin:       http://$API_DOMAIN/admin/"
 echo ""
-echo "  Services:"
-echo "    Nginx:     https://$API_DOMAIN (port 80→443)"
-echo "    Health:    https://$API_DOMAIN/api/v1/health/"
-echo "    Admin:     https://$API_DOMAIN/admin/"
+echo "  Backend:     127.0.0.1:8001 (Docker → Daphne ASGI)"
+echo "  Nginx:       Host nginx proxying $API_DOMAIN → :8001"
 echo ""
-echo "  SSL:       Let's Encrypt (auto-renews via Certbot container)"
+echo "  Next steps:"
+echo "    1. Ensure DNS A records point to this server"
+echo "    2. Run: sudo certbot --nginx -d $API_DOMAIN -d $DOMAIN"
+echo "    3. Test: curl https://$API_DOMAIN/api/v1/health/"
 echo ""
 echo "  Management:"
 echo "    Logs:      $DC -f docker-compose.prod.yml logs -f"
 echo "    Stop:      $DC -f docker-compose.prod.yml down"
 echo "    Restart:   $DC -f docker-compose.prod.yml restart"
-echo "    SSL renew: $DC -f docker-compose.prod.yml run --rm certbot certbot renew"
 echo "═══════════════════════════════════════════════════════"
