@@ -8,9 +8,7 @@
 #
 # Prerequisites:
 #   1. VPS (Ubuntu 22.04+) with Docker, Docker Compose, nginx already installed
-#   2. DNS A records:
-#        social.otaskflow.com       → 104.248.171.137
-#        api.social.otaskflow.com   → 104.248.171.137
+#   2. DNS A record:  social.otaskflow.com → 104.248.171.137
 #   3. .env.production configured (see .env.production.template)
 # ═══════════════════════════════════════════════════════════════════
 
@@ -18,7 +16,6 @@ set -e
 
 PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 DOMAIN="social.otaskflow.com"
-API_DOMAIN="api.social.otaskflow.com"
 EMAIL="support@otaskflow.com"
 
 # Use modern "docker compose" plugin syntax (fallback to docker-compose if available)
@@ -76,11 +73,11 @@ mkdir -p "$PROJECT_ROOT/backend/media"
 # ── Install host nginx config ────────────────────────────────────
 NGINX_CONF="$PROJECT_ROOT/nginx/social.otaskflow.com.conf"
 if [ -f "$NGINX_CONF" ]; then
-    echo "📦 Installing nginx server block for $API_DOMAIN..."
+    echo "📦 Installing nginx server block for $DOMAIN..."
     sudo cp "$NGINX_CONF" /etc/nginx/sites-available/social.otaskflow.com
     sudo ln -sf /etc/nginx/sites-available/social.otaskflow.com /etc/nginx/sites-enabled/
     sudo nginx -t && sudo systemctl reload nginx
-    echo "✅ Host nginx configured for $API_DOMAIN"
+    echo "✅ Host nginx configured for $DOMAIN"
 else
     echo "⚠️  Nginx config not found at $NGINX_CONF — skipping"
 fi
@@ -111,10 +108,10 @@ else
 fi
 
 # ── SSL (Let's Encrypt via host certbot) ─────────────────────────
-if [ ! -d "/etc/letsencrypt/live/$API_DOMAIN" ]; then
+if [ ! -d "/etc/letsencrypt/live/$DOMAIN" ]; then
     echo ""
     echo "🔒 To enable HTTPS, run:"
-    echo "   sudo certbot --nginx -d $API_DOMAIN -d $DOMAIN"
+    echo "   sudo certbot --nginx -d $DOMAIN"
     echo ""
 fi
 
@@ -122,17 +119,17 @@ echo ""
 echo "═══════════════════════════════════════════════════════"
 echo "  ✅  Production deployment complete!"
 echo ""
-echo "  API (HTTP):  http://$API_DOMAIN/api/v1/"
-echo "  Health:      http://$API_DOMAIN/api/v1/health/"
-echo "  Admin:       http://$API_DOMAIN/admin/"
+echo "  API (HTTP):  http://$DOMAIN/api/v1/"
+echo "  Health:      http://$DOMAIN/api/v1/health/"
+echo "  Admin:       http://$DOMAIN/admin/"
 echo ""
 echo "  Backend:     127.0.0.1:8001 (Docker → Daphne ASGI)"
-echo "  Nginx:       Host nginx proxying $API_DOMAIN → :8001"
+echo "  Nginx:       Host nginx proxying $DOMAIN → :8001"
 echo ""
 echo "  Next steps:"
-echo "    1. Ensure DNS A records point to this server"
-echo "    2. Run: sudo certbot --nginx -d $API_DOMAIN -d $DOMAIN"
-echo "    3. Test: curl https://$API_DOMAIN/api/v1/health/"
+echo "    1. Ensure DNS A record points to this server"
+echo "    2. Run: sudo certbot --nginx -d $DOMAIN"
+echo "    3. Test: curl https://$DOMAIN/api/v1/health/"
 echo ""
 echo "  Management:"
 echo "    Logs:      $DC -f docker-compose.prod.yml logs -f"
