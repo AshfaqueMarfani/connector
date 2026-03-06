@@ -57,10 +57,7 @@ class Command(BaseCommand):
         if not isinstance(entities, list):
             raise CommandError("JSON file must contain a top-level array of objects.")
 
-        self.stdout.write(
-            f"Found {len(entities)} entities in {json_file} "
-            f"(type={account_type}, dry_run={dry_run})"
-        )
+        self.stdout.write(f"Found {len(entities)} entities in {json_file} " f"(type={account_type}, dry_run={dry_run})")
 
         """
         Expected JSON format per entity:
@@ -83,30 +80,21 @@ class Command(BaseCommand):
             try:
                 name = entity.get("name", "").strip()
                 if not name:
-                    self.stdout.write(
-                        self.style.WARNING(f"  [{idx}] Skipping: missing 'name'")
-                    )
+                    self.stdout.write(self.style.WARNING(f"  [{idx}] Skipping: missing 'name'"))
                     skipped += 1
                     continue
 
                 lat = entity.get("latitude")
                 lon = entity.get("longitude")
                 if lat is None or lon is None:
-                    self.stdout.write(
-                        self.style.WARNING(
-                            f"  [{idx}] Skipping '{name}': missing coordinates"
-                        )
-                    )
+                    self.stdout.write(self.style.WARNING(f"  [{idx}] Skipping '{name}': missing coordinates"))
                     skipped += 1
                     continue
 
                 # Validate coordinate ranges
                 if not (-90 <= lat <= 90) or not (-180 <= lon <= 180):
                     self.stdout.write(
-                        self.style.WARNING(
-                            f"  [{idx}] Skipping '{name}': invalid coordinates "
-                            f"({lat}, {lon})"
-                        )
+                        self.style.WARNING(f"  [{idx}] Skipping '{name}': invalid coordinates " f"({lat}, {lon})")
                     )
                     skipped += 1
                     continue
@@ -118,10 +106,7 @@ class Command(BaseCommand):
                     email = f"ingested_{slug}_{idx}@entities.connector.dev"
 
                 if dry_run:
-                    self.stdout.write(
-                        f"  [DRY RUN] Would create: {name} ({email}) at "
-                        f"({lat}, {lon})"
-                    )
+                    self.stdout.write(f"  [DRY RUN] Would create: {name} ({email}) at " f"({lat}, {lon})")
                     created += 1
                     continue
 
@@ -164,14 +149,9 @@ class Command(BaseCommand):
                 self.stdout.write(f"  Created: {name} ({email})")
 
             except Exception as e:
-                self.stdout.write(
-                    self.style.ERROR(f"  [{idx}] Error processing entity: {e}")
-                )
+                self.stdout.write(self.style.ERROR(f"  [{idx}] Error processing entity: {e}"))
                 errors += 1
 
         self.stdout.write(
-            self.style.SUCCESS(
-                f"\nIngestion complete: {created} created, "
-                f"{skipped} skipped, {errors} errors."
-            )
+            self.style.SUCCESS(f"\nIngestion complete: {created} created, " f"{skipped} skipped, {errors} errors.")
         )

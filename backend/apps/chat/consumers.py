@@ -55,16 +55,12 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         # Verify the user is a participant of this room
         is_member = await self._is_room_member()
         if not is_member:
-            logger.warning(
-                f"WebSocket rejected – user {self.user.email} not in room {self.room_id}"
-            )
+            logger.warning(f"WebSocket rejected – user {self.user.email} not in room {self.room_id}")
             await self.close(code=4003)
             return
 
         # Join the room group
-        await self.channel_layer.group_add(
-            self.room_group_name, self.channel_name
-        )
+        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 
         await self.accept()
 
@@ -81,9 +77,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             },
         )
 
-        logger.info(
-            f"WebSocket connected: user={self.user.email} room={self.room_id}"
-        )
+        logger.info(f"WebSocket connected: user={self.user.email} room={self.room_id}")
 
     async def disconnect(self, close_code):
         """Leave the chat room group and update presence."""
@@ -98,16 +92,13 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 },
             )
 
-            await self.channel_layer.group_discard(
-                self.room_group_name, self.channel_name
-            )
+            await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
         if self.user and self.user.is_authenticated:
             await self._set_online(False)
 
         logger.info(
-            f"WebSocket disconnected: user={getattr(self.user, 'email', '?')} "
-            f"room={self.room_id} code={close_code}"
+            f"WebSocket disconnected: user={getattr(self.user, 'email', '?')} " f"room={self.room_id} code={close_code}"
         )
 
     async def receive_json(self, content, **kwargs):
@@ -134,9 +125,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         elif msg_type == "chat.location":
             await self._handle_location_share(content)
         else:
-            await self.send_json(
-                {"type": "error", "message": f"Unknown message type: {msg_type}"}
-            )
+            await self.send_json({"type": "error", "message": f"Unknown message type: {msg_type}"})
 
     # ── Message handlers ────────────────────────────────────────────
 
@@ -148,15 +137,11 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             return
 
         if len(text) > 2000:
-            await self.send_json(
-                {"type": "error", "message": "Message too long (max 2000 chars)."}
-            )
+            await self.send_json({"type": "error", "message": "Message too long (max 2000 chars)."})
             return
 
         # Persist to database
-        message = await self._save_message(
-            message_type=Message.MessageType.TEXT, content=text
-        )
+        message = await self._save_message(message_type=Message.MessageType.TEXT, content=text)
 
         # Broadcast to room
         await self.channel_layer.group_send(
@@ -216,9 +201,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         longitude = content.get("longitude")
 
         if latitude is None or longitude is None:
-            await self.send_json(
-                {"type": "error", "message": "latitude and longitude required."}
-            )
+            await self.send_json({"type": "error", "message": "latitude and longitude required."})
             return
 
         try:
@@ -227,15 +210,11 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             if not (-90 <= latitude <= 90) or not (-180 <= longitude <= 180):
                 raise ValueError("Coordinates out of range")
         except (TypeError, ValueError):
-            await self.send_json(
-                {"type": "error", "message": "Invalid coordinates."}
-            )
+            await self.send_json({"type": "error", "message": "Invalid coordinates."})
             return
 
         # Save as location message
-        location_content = json.dumps(
-            {"latitude": latitude, "longitude": longitude}
-        )
+        location_content = json.dumps({"latitude": latitude, "longitude": longitude})
         message = await self._save_message(
             message_type=Message.MessageType.LOCATION,
             content=location_content,
@@ -366,9 +345,7 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
 
         self.notification_group = f"notifications_{self.user.id}"
 
-        await self.channel_layer.group_add(
-            self.notification_group, self.channel_name
-        )
+        await self.channel_layer.group_add(self.notification_group, self.channel_name)
         await self.accept()
 
         logger.info(f"Notification WS connected: user={self.user.email}")
@@ -376,9 +353,7 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
     async def disconnect(self, close_code):
         """Leave the notification group."""
         if self.notification_group:
-            await self.channel_layer.group_discard(
-                self.notification_group, self.channel_name
-            )
+            await self.channel_layer.group_discard(self.notification_group, self.channel_name)
 
     async def receive_json(self, content, **kwargs):
         """
@@ -417,9 +392,7 @@ class NotificationConsumer(AsyncJsonWebsocketConsumer):
         from apps.chat.models import Notification
 
         try:
-            notif = Notification.objects.get(
-                id=notification_id, user=self.user, is_read=False
-            )
+            notif = Notification.objects.get(id=notification_id, user=self.user, is_read=False)
             notif.is_read = True
             notif.read_at = timezone.now()
             notif.save(update_fields=["is_read", "read_at"])

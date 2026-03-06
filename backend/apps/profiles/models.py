@@ -70,10 +70,7 @@ class Profile(models.Model):
         models.CharField(max_length=50),
         blank=True,
         default=list,
-        help_text=_(
-            "AI-generated or user-set tags for matching "
-            "(e.g., 'Food', 'Shelter', 'Electrician')."
-        ),
+        help_text=_("AI-generated or user-set tags for matching " "(e.g., 'Food', 'Shelter', 'Electrician')."),
     )
 
     # Privacy toggle — critical for App Store compliance

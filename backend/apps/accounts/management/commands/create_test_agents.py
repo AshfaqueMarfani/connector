@@ -22,7 +22,6 @@ from apps.accounts.models import User
 from apps.locations.models import UserLocation
 from apps.statuses.models import Status
 
-
 # ── Agent definitions ─────────────────────────────────────────────────────
 AGENTS = [
     {
@@ -131,9 +130,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if options["clear"]:
-            deleted, _ = User.objects.filter(
-                email__in=[a["email"] for a in AGENTS]
-            ).delete()
+            deleted, _ = User.objects.filter(email__in=[a["email"] for a in AGENTS]).delete()
             self.stdout.write(self.style.WARNING(f"Deleted {deleted} existing objects."))
 
         self.stdout.write("")
@@ -197,17 +194,11 @@ class Command(BaseCommand):
 
             created += 1
             kind = agent["account_type"].upper()
-            self.stdout.write(
-                self.style.SUCCESS(
-                    f"  ✅  {email:<25} {kind:<12} {agent['full_name']}"
-                )
-            )
+            self.stdout.write(self.style.SUCCESS(f"  ✅  {email:<25} {kind:<12} {agent['full_name']}"))
 
         self.stdout.write("")
         self.stdout.write("=" * 55)
-        self.stdout.write(
-            self.style.SUCCESS(f"Done — {created} test agent(s) created.")
-        )
+        self.stdout.write(self.style.SUCCESS(f"Done — {created} test agent(s) created."))
         self.stdout.write("")
         self.stdout.write("  Credentials:")
         self.stdout.write(f"    Password (all):  {PASSWORD}")

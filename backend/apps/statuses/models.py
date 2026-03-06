@@ -83,9 +83,7 @@ class Status(models.Model):
         geography=True,
         null=True,
         blank=True,
-        help_text=_(
-            "Obfuscated point for private users; exact point for public entities."
-        ),
+        help_text=_("Obfuscated point for private users; exact point for public entities."),
     )
 
     # Lifecycle

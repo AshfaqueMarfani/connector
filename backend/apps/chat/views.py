@@ -71,8 +71,7 @@ class ConnectionRequestCreateView(APIView):
 
         # Check if blocked (either direction)
         is_blocked = Block.objects.filter(
-            Q(blocker=request.user, blocked=to_user)
-            | Q(blocker=to_user, blocked=request.user)
+            Q(blocker=request.user, blocked=to_user) | Q(blocker=to_user, blocked=request.user)
         ).exists()
         if is_blocked:
             return Response(
@@ -82,8 +81,7 @@ class ConnectionRequestCreateView(APIView):
 
         # Check for existing pending request (either direction)
         existing = ConnectionRequest.objects.filter(
-            Q(from_user=request.user, to_user=to_user)
-            | Q(from_user=to_user, to_user=request.user),
+            Q(from_user=request.user, to_user=to_user) | Q(from_user=to_user, to_user=request.user),
             status=ConnectionRequest.RequestStatus.PENDING,
         ).first()
         if existing:
@@ -94,8 +92,7 @@ class ConnectionRequestCreateView(APIView):
 
         # Check for existing accepted connection (already have a chat room)
         already_connected = ConnectionRequest.objects.filter(
-            Q(from_user=request.user, to_user=to_user)
-            | Q(from_user=to_user, to_user=request.user),
+            Q(from_user=request.user, to_user=to_user) | Q(from_user=to_user, to_user=request.user),
             status=ConnectionRequest.RequestStatus.ACCEPTED,
         ).exists()
         if already_connected:
@@ -127,9 +124,7 @@ class ConnectionRequestCreateView(APIView):
         # Push real-time notification
         send_realtime_notification(to_user.id, notification)
 
-        logger.info(
-            f"Connection request sent: {request.user.email} → {to_user.email}"
-        )
+        logger.info(f"Connection request sent: {request.user.email} → {to_user.email}")
 
         return Response(
             {
@@ -220,10 +215,7 @@ class ConnectionRequestRespondView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        logger.info(
-            f"Connection {action}: {conn_request.from_user.email} → "
-            f"{conn_request.to_user.email}"
-        )
+        logger.info(f"Connection {action}: {conn_request.from_user.email} → " f"{conn_request.to_user.email}")
 
         return Response(
             {
@@ -258,9 +250,7 @@ class ConnectionRequestListView(generics.ListAPIView):
         elif direction == "received":
             qs = ConnectionRequest.objects.filter(to_user=user)
         else:
-            qs = ConnectionRequest.objects.filter(
-                Q(from_user=user) | Q(to_user=user)
-            )
+            qs = ConnectionRequest.objects.filter(Q(from_user=user) | Q(to_user=user))
 
         if req_status:
             qs = qs.filter(status=req_status)
@@ -284,9 +274,7 @@ class ChatRoomListView(generics.ListAPIView):
 
     def get_queryset(self):
         return (
-            ChatRoom.objects.filter(
-                participants=self.request.user, is_active=True
-            )
+            ChatRoom.objects.filter(participants=self.request.user, is_active=True)
             .prefetch_related("participants")
             .order_by("-updated_at")
         )
@@ -301,9 +289,7 @@ class ChatRoomDetailView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, room_id):
-        room = get_object_or_404(
-            ChatRoom, id=room_id, is_active=True
-        )
+        room = get_object_or_404(ChatRoom, id=room_id, is_active=True)
         if not room.participants.filter(id=request.user.id).exists():
             return Response(
                 {"success": False, "message": "Not a participant."},
@@ -335,11 +321,7 @@ class MessageListView(generics.ListAPIView):
         if not room.participants.filter(id=self.request.user.id).exists():
             return Message.objects.none()
 
-        return (
-            Message.objects.filter(room=room)
-            .select_related("sender")
-            .order_by("created_at")
-        )
+        return Message.objects.filter(room=room).select_related("sender").order_by("created_at")
 
 
 class MessageCreateView(APIView):
@@ -388,9 +370,7 @@ class MessageCreateView(APIView):
             )
             send_realtime_notification(other_user.id, notification)
 
-        logger.info(
-            f"Message sent (REST): room={room_id} sender={request.user.email}"
-        )
+        logger.info(f"Message sent (REST): room={room_id} sender={request.user.email}")
 
         return Response(
             {
@@ -419,12 +399,16 @@ class MarkMessagesReadView(APIView):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        updated = Message.objects.filter(
-            room=room,
-            is_read=False,
-        ).exclude(sender=request.user).update(
-            is_read=True,
-            read_at=timezone.now(),
+        updated = (
+            Message.objects.filter(
+                room=room,
+                is_read=False,
+            )
+            .exclude(sender=request.user)
+            .update(
+                is_read=True,
+                read_at=timezone.now(),
+            )
         )
 
         return Response(
@@ -468,9 +452,7 @@ class NotificationMarkReadView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, pk):
-        notification = get_object_or_404(
-            Notification, id=pk, user=request.user
-        )
+        notification = get_object_or_404(Notification, id=pk, user=request.user)
         if not notification.is_read:
             notification.is_read = True
             notification.read_at = timezone.now()
@@ -488,9 +470,9 @@ class NotificationMarkAllReadView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
-        updated = Notification.objects.filter(
-            user=request.user, is_read=False
-        ).update(is_read=True, read_at=timezone.now())
+        updated = Notification.objects.filter(user=request.user, is_read=False).update(
+            is_read=True, read_at=timezone.now()
+        )
 
         return Response(
             {
@@ -509,8 +491,6 @@ class NotificationUnreadCountView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
-        count = Notification.objects.filter(
-            user=request.user, is_read=False
-        ).count()
+        count = Notification.objects.filter(user=request.user, is_read=False).count()
 
         return Response({"success": True, "data": {"unread_count": count}})

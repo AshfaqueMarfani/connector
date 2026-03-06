@@ -92,8 +92,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
                         {
                             "success": False,
                             "errors": {
-                                "detail": "Your account has been suspended. "
-                                "Contact support for more information."
+                                "detail": "Your account has been suspended. " "Contact support for more information."
                             },
                         },
                         status=status.HTTP_403_FORBIDDEN,
@@ -103,9 +102,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
                     return Response(
                         {
                             "success": False,
-                            "errors": {
-                                "detail": "You must accept the EULA before logging in."
-                            },
+                            "errors": {"detail": "You must accept the EULA before logging in."},
                         },
                         status=status.HTTP_403_FORBIDDEN,
                     )

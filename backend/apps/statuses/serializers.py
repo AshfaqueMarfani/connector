@@ -28,9 +28,7 @@ class StatusCreateSerializer(serializers.ModelSerializer):
 
     def validate_text(self, value):
         if len(value.strip()) < 10:
-            raise serializers.ValidationError(
-                "Status text must be at least 10 characters."
-            )
+            raise serializers.ValidationError("Status text must be at least 10 characters.")
         return value.strip()
 
 

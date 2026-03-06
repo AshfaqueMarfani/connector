@@ -58,6 +58,7 @@ class StatusCreateView(generics.CreateAPIView):
 
             # Trigger Celery task for AI parsing & matching
             from apps.matching.tasks import parse_status_intent
+
             parse_status_intent.delay(str(serializer.instance.id))
 
             return Response(

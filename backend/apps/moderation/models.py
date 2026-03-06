@@ -198,7 +198,4 @@ class Report(models.Model):
         ]
 
     def __str__(self):
-        return (
-            f"Report #{str(self.id)[:8]} — "
-            f"{self.get_category_display()} against {self.reported_user.email}"
-        )
+        return f"Report #{str(self.id)[:8]} — " f"{self.get_category_display()} against {self.reported_user.email}"

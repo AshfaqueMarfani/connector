@@ -64,9 +64,7 @@ class ChatRoomSerializer(serializers.ModelSerializer):
         """Count of unread messages for the requesting user."""
         request = self.context.get("request")
         if request and hasattr(request, "user"):
-            return obj.messages.filter(is_read=False).exclude(
-                sender=request.user
-            ).count()
+            return obj.messages.filter(is_read=False).exclude(sender=request.user).count()
         return 0
 
 

@@ -93,7 +93,5 @@ class UserAdmin(BaseUserAdmin):
 
     @admin.action(description="Unsuspend selected users")
     def unsuspend_users(self, request, queryset):
-        count = queryset.filter(is_suspended=True).update(
-            is_suspended=False, is_active=True
-        )
+        count = queryset.filter(is_suspended=True).update(is_suspended=False, is_active=True)
         self.message_user(request, f"{count} user(s) unsuspended.")

@@ -34,12 +34,8 @@ class BlockCreateSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         request = self.context.get("request")
-        if request and Block.objects.filter(
-            blocker=request.user, blocked=attrs["blocked"]
-        ).exists():
-            raise serializers.ValidationError(
-                {"blocked": "You have already blocked this user."}
-            )
+        if request and Block.objects.filter(blocker=request.user, blocked=attrs["blocked"]).exists():
+            raise serializers.ValidationError({"blocked": "You have already blocked this user."})
         return attrs
 
 
@@ -113,9 +109,7 @@ class ReportAdminSerializer(serializers.ModelSerializer):
     """
 
     reporter_email = serializers.CharField(source="reporter.email", read_only=True)
-    reported_user_email = serializers.CharField(
-        source="reported_user.email", read_only=True
-    )
+    reported_user_email = serializers.CharField(source="reported_user.email", read_only=True)
 
     class Meta:
         model = Report

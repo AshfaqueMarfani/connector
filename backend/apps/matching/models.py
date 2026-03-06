@@ -112,10 +112,7 @@ class AIMatchResult(models.Model):
         ]
 
     def __str__(self):
-        return (
-            f"Match: {self.status} → {self.matched_user} "
-            f"(score={self.score:.2f})"
-        )
+        return f"Match: {self.status} → {self.matched_user} " f"(score={self.score:.2f})"
 
 
 class DataIngestionJob(models.Model):

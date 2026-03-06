@@ -22,63 +22,158 @@ logger = logging.getLogger("apps")
 # ---------------------------------------------------------------------------
 CATEGORY_KEYWORDS = {
     "food": [
-        "food", "meal", "grocery", "hunger", "eat", "cooking",
-        "restaurant", "catering", "nutrition", "pantry", "ration",
+        "food",
+        "meal",
+        "grocery",
+        "hunger",
+        "eat",
+        "cooking",
+        "restaurant",
+        "catering",
+        "nutrition",
+        "pantry",
+        "ration",
     ],
     "shelter": [
-        "shelter", "housing", "home", "rent", "accommodation",
-        "homeless", "roof", "apartment",
+        "shelter",
+        "housing",
+        "home",
+        "rent",
+        "accommodation",
+        "homeless",
+        "roof",
+        "apartment",
     ],
     "medical": [
-        "medical", "health", "doctor", "hospital", "clinic",
-        "medicine", "nurse", "therapy", "dental", "emergency medical",
+        "medical",
+        "health",
+        "doctor",
+        "hospital",
+        "clinic",
+        "medicine",
+        "nurse",
+        "therapy",
+        "dental",
+        "emergency medical",
     ],
     "education": [
-        "education", "tutoring", "school", "learning", "teach",
-        "tutor", "course", "training", "literacy", "scholarship",
+        "education",
+        "tutoring",
+        "school",
+        "learning",
+        "teach",
+        "tutor",
+        "course",
+        "training",
+        "literacy",
+        "scholarship",
     ],
     "legal": [
-        "legal", "lawyer", "law", "court", "advocate", "rights", "justice",
+        "legal",
+        "lawyer",
+        "law",
+        "court",
+        "advocate",
+        "rights",
+        "justice",
     ],
     "employment": [
-        "job", "employment", "work", "hire", "career", "resume",
-        "internship", "skill training",
+        "job",
+        "employment",
+        "work",
+        "hire",
+        "career",
+        "resume",
+        "internship",
+        "skill training",
     ],
     "transport": [
-        "transport", "ride", "car", "travel", "delivery", "moving",
-        "logistics", "ambulance",
+        "transport",
+        "ride",
+        "car",
+        "travel",
+        "delivery",
+        "moving",
+        "logistics",
+        "ambulance",
     ],
     "financial": [
-        "money", "loan", "financial", "fund", "donate", "grant",
-        "microfinance", "payment", "zakat",
+        "money",
+        "loan",
+        "financial",
+        "fund",
+        "donate",
+        "grant",
+        "microfinance",
+        "payment",
+        "zakat",
     ],
     "clothing": [
-        "clothes", "clothing", "wear", "garment", "textile", "fabric",
+        "clothes",
+        "clothing",
+        "wear",
+        "garment",
+        "textile",
+        "fabric",
     ],
     "technology": [
-        "tech", "computer", "software", "internet", "phone", "repair",
-        "programming", "web",
+        "tech",
+        "computer",
+        "software",
+        "internet",
+        "phone",
+        "repair",
+        "programming",
+        "web",
     ],
     "childcare": [
-        "child", "daycare", "babysit", "kids", "nursery", "parenting",
+        "child",
+        "daycare",
+        "babysit",
+        "kids",
+        "nursery",
+        "parenting",
     ],
     "elderly": [
-        "elderly", "senior", "old age", "geriatric",
+        "elderly",
+        "senior",
+        "old age",
+        "geriatric",
     ],
     "disability": [
-        "disability", "accessible", "wheelchair", "impaired", "special needs",
+        "disability",
+        "accessible",
+        "wheelchair",
+        "impaired",
+        "special needs",
     ],
     "mental_health": [
-        "mental", "counseling", "depression", "anxiety", "stress",
-        "psychological", "therapy",
+        "mental",
+        "counseling",
+        "depression",
+        "anxiety",
+        "stress",
+        "psychological",
+        "therapy",
     ],
     "community": [
-        "community", "volunteer", "social", "event", "gathering",
-        "outreach", "charity",
+        "community",
+        "volunteer",
+        "social",
+        "event",
+        "gathering",
+        "outreach",
+        "charity",
     ],
     "utilities": [
-        "electric", "plumbing", "water", "gas", "repair",
-        "maintenance", "handyman", "carpenter",
+        "electric",
+        "plumbing",
+        "water",
+        "gas",
+        "repair",
+        "maintenance",
+        "handyman",
+        "carpenter",
     ],
 }
 
@@ -90,6 +185,7 @@ def _get_openai_client():
         return None
     try:
         from openai import OpenAI
+
         return OpenAI(api_key=api_key)
     except ImportError:
         logger.warning("openai package not installed — using keyword fallback")
@@ -180,8 +276,13 @@ class AIService:
         # Urgency detection
         urgency = "medium"
         emergency_words = [
-            "emergency", "urgent", "critical", "asap",
-            "immediately", "dying", "desperate",
+            "emergency",
+            "urgent",
+            "critical",
+            "asap",
+            "immediately",
+            "dying",
+            "desperate",
         ]
         high_words = ["need", "help", "important", "soon", "quickly"]
 
@@ -197,17 +298,12 @@ class AIService:
                     break
 
         primary_category = matched_categories[0] if matched_categories else "general"
-        all_tags = matched_categories + [
-            t for t in matched_keywords if t not in matched_categories
-        ]
+        all_tags = matched_categories + [t for t in matched_keywords if t not in matched_categories]
 
         # Build human-readable intent description
         action = "needs" if status_type == "need" else "offers"
         if matched_categories:
-            intent = (
-                f"User {action} {primary_category}-related assistance: "
-                f"{text[:100]}"
-            )
+            intent = f"User {action} {primary_category}-related assistance: " f"{text[:100]}"
         else:
             intent = f"User {action}: {text[:150]}"
 
@@ -222,9 +318,7 @@ class AIService:
     # Profile Tag Generation
     # ------------------------------------------------------------------
     @staticmethod
-    def generate_profile_tags(
-        skills: list, interests: list, bio: str = ""
-    ) -> list:
+    def generate_profile_tags(skills: list, interests: list, bio: str = "") -> list:
         """Generate category tags from profile data."""
         client = _get_openai_client()
         if client:
@@ -250,9 +344,7 @@ class AIService:
                     {
                         "role": "user",
                         "content": (
-                            f"Skills: {', '.join(skills)}\n"
-                            f"Interests: {', '.join(interests)}\n"
-                            f"Bio: {bio}"
+                            f"Skills: {', '.join(skills)}\n" f"Interests: {', '.join(interests)}\n" f"Bio: {bio}"
                         ),
                     },
                 ],

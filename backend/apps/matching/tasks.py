@@ -51,7 +51,9 @@ def parse_status_intent(self, status_id: str):
 
         logger.info(
             "Parsed status %s: tags=%s, category=%s",
-            status_id, result["tags"], result["category"],
+            status_id,
+            result["tags"],
+            result["category"],
         )
 
         # Chain: trigger matching after parsing
@@ -87,7 +89,8 @@ def find_matches_for_status(self, status_id: str):
 
     try:
         status = Status.objects.select_related(
-            "user", "user__profile",
+            "user",
+            "user__profile",
         ).get(id=status_id, is_active=True)
     except Status.DoesNotExist:
         logger.warning("Status %s not found", status_id)
@@ -109,11 +112,13 @@ def find_matches_for_status(self, status_id: str):
     # Gather blocked user IDs (both directions)
     blocked_ids = set(
         Block.objects.filter(blocker=status.user).values_list(
-            "blocked_id", flat=True,
+            "blocked_id",
+            flat=True,
         )
     ) | set(
         Block.objects.filter(blocked=status.user).values_list(
-            "blocker_id", flat=True,
+            "blocker_id",
+            flat=True,
         )
     )
 
@@ -217,10 +222,7 @@ def _send_match_notification_to_owner(status, matched_user, score_result):
         user=status.user,
         notification_type=Notification.NotificationType.AI_MATCH,
         title="Someone nearby matches your broadcast",
-        body=(
-            f"{matched_user.full_name} matches your "
-            f"{status.get_status_type_display().lower()}"
-        ),
+        body=(f"{matched_user.full_name} matches your " f"{status.get_status_type_display().lower()}"),
         data={
             "status_id": str(status.id),
             "matched_user_id": str(matched_user.id),
@@ -299,7 +301,9 @@ def expire_old_statuses():
     ).update(match_status=AIMatchResult.MatchStatus.EXPIRED)
 
     logger.info(
-        "Expired %d statuses (expiry), %d stale statuses", expired, stale,
+        "Expired %d statuses (expiry), %d stale statuses",
+        expired,
+        stale,
     )
     return {"expired": expired, "stale": stale}
 
@@ -312,11 +316,7 @@ def run_batch_matching():
     """Re-run matching for all active, already-parsed statuses."""
     from apps.statuses.models import Status
 
-    active_statuses = (
-        Status.objects.filter(is_active=True)
-        .exclude(ai_tags=[])
-        .values_list("id", flat=True)
-    )
+    active_statuses = Status.objects.filter(is_active=True).exclude(ai_tags=[]).values_list("id", flat=True)
 
     count = 0
     for status_id in active_statuses:
@@ -414,16 +414,14 @@ def process_ingestion_job(self, job_id: str, entities_data: list):
     job.processed_records = processed
     job.failed_records = failed
     job.error_log = "\n".join(errors)
-    job.job_status = (
-        DataIngestionJob.JobStatus.COMPLETED
-        if failed == 0
-        else DataIngestionJob.JobStatus.FAILED
-    )
+    job.job_status = DataIngestionJob.JobStatus.COMPLETED if failed == 0 else DataIngestionJob.JobStatus.FAILED
     job.completed_at = timezone.now()
     job.save()
 
     logger.info(
         "Ingestion job %s complete: %d processed, %d failed",
-        job_id, processed, failed,
+        job_id,
+        processed,
+        failed,
     )
     return {"job_id": job_id, "processed": processed, "failed": failed}

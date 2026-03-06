@@ -42,9 +42,7 @@ class ChatRoom(models.Model):
         ordering = ["-updated_at"]
 
     def __str__(self):
-        emails = ", ".join(
-            self.participants.values_list("email", flat=True)[:2]
-        )
+        emails = ", ".join(self.participants.values_list("email", flat=True)[:2])
         return f"ChatRoom({emails})"
 
     @property
@@ -194,10 +192,7 @@ class ConnectionRequest(models.Model):
         ]
 
     def __str__(self):
-        return (
-            f"{self.from_user.email} → {self.to_user.email} "
-            f"({self.get_status_display()})"
-        )
+        return f"{self.from_user.email} → {self.to_user.email} " f"({self.get_status_display()})"
 
     def accept(self):
         """

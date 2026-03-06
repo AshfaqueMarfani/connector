@@ -38,9 +38,7 @@ class HealthCheckView(View):
             from asgiref.sync import async_to_sync
 
             channel_layer = get_channel_layer()
-            async_to_sync(channel_layer.send)(
-                "health-check", {"type": "health.check"}
-            )
+            async_to_sync(channel_layer.send)("health-check", {"type": "health.check"})
             async_to_sync(channel_layer.receive)("health-check")
             health["services"]["redis"] = "up"
         except Exception:

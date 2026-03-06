@@ -58,9 +58,7 @@ class LocationUpdateView(APIView):
                 user=user,
                 defaults={
                     "point": Point(data["longitude"], data["latitude"], srid=4326),
-                    "obfuscated_point": Point(
-                        data["longitude"], data["latitude"], srid=4326
-                    ),
+                    "obfuscated_point": Point(data["longitude"], data["latitude"], srid=4326),
                 },
             )
 
@@ -78,11 +76,7 @@ class LocationUpdateView(APIView):
 
             # Log to history (obfuscated point for private users)
             profile = user.profile
-            history_point = (
-                location.obfuscated_point
-                if profile.should_obfuscate_location
-                else location.point
-            )
+            history_point = location.obfuscated_point if profile.should_obfuscate_location else location.point
             LocationHistory.objects.create(
                 user=user,
                 point=history_point,
@@ -174,9 +168,7 @@ class ExploreNearbyView(APIView):
             return Response(
                 {
                     "success": False,
-                    "errors": {
-                        "detail": "You must update your location before exploring nearby users."
-                    },
+                    "errors": {"detail": "You must update your location before exploring nearby users."},
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
@@ -190,9 +182,7 @@ class ExploreNearbyView(APIView):
 
         type_filter = request.query_params.get("type", "")
         account_types = [
-            t.strip().lower()
-            for t in type_filter.split(",")
-            if t.strip().lower() in ("individual", "business", "ngo")
+            t.strip().lower() for t in type_filter.split(",") if t.strip().lower() in ("individual", "business", "ngo")
         ]
 
         try:
@@ -200,18 +190,14 @@ class ExploreNearbyView(APIView):
             search_center = user_location.point
 
             # Get list of users blocked by or blocking the current user
-            blocked_user_ids = set(
-                Block.objects.filter(blocker=user).values_list("blocked_id", flat=True)
-            ) | set(
+            blocked_user_ids = set(Block.objects.filter(blocker=user).values_list("blocked_id", flat=True)) | set(
                 Block.objects.filter(blocked=user).values_list("blocker_id", flat=True)
             )
 
             # PostGIS ST_DWithin query on the obfuscated_point field
             # This ensures we're searching against what the public map actually shows
             nearby_locations = (
-                UserLocation.objects.filter(
-                    obfuscated_point__dwithin=(search_center, D(m=radius))
-                )
+                UserLocation.objects.filter(obfuscated_point__dwithin=(search_center, D(m=radius)))
                 .exclude(user=user)
                 .exclude(user_id__in=blocked_user_ids)
                 .exclude(user__is_active=False)
@@ -221,14 +207,12 @@ class ExploreNearbyView(APIView):
 
             # Filter by account type if specified
             if account_types:
-                nearby_locations = nearby_locations.filter(
-                    user__account_type__in=account_types
-                )
+                nearby_locations = nearby_locations.filter(user__account_type__in=account_types)
 
             # Annotate with distance from the search center and order by it
-            nearby_locations = nearby_locations.annotate(
-                distance=Distance("obfuscated_point", search_center)
-            ).order_by("distance")
+            nearby_locations = nearby_locations.annotate(distance=Distance("obfuscated_point", search_center)).order_by(
+                "distance"
+            )
 
             # Build response data
             results = []
@@ -241,9 +225,7 @@ class ExploreNearbyView(APIView):
                     {
                         "profile": profile_serializer.data,
                         "location": location_serializer.data,
-                        "distance_meters": round(loc.distance.m, 1)
-                        if loc.distance
-                        else None,
+                        "distance_meters": round(loc.distance.m, 1) if loc.distance else None,
                     }
                 )
 

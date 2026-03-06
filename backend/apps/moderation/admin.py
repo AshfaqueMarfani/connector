@@ -136,12 +136,9 @@ class ReportAdmin(admin.ModelAdmin):
                 count += 1
                 report.status = "resolved"
                 report.moderator_notes += (
-                    f"\n[AUTO] User suspended by {request.user.email} on "
-                    f"{timezone.now().isoformat()}"
+                    f"\n[AUTO] User suspended by {request.user.email} on " f"{timezone.now().isoformat()}"
                 )
                 report.resolved_at = timezone.now()
                 report.resolved_by = request.user
                 report.save()
-        self.message_user(
-            request, f"{count} user(s) suspended and report(s) resolved."
-        )
+        self.message_user(request, f"{count} user(s) suspended and report(s) resolved.")

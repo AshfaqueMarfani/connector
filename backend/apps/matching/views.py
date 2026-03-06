@@ -43,7 +43,9 @@ class MatchListView(generics.ListAPIView):
                 AIMatchResult.MatchStatus.VIEWED,
             ],
         ).select_related(
-            "status", "status_owner", "status_owner__profile",
+            "status",
+            "status_owner",
+            "status_owner__profile",
             "matched_user",
         )
 
@@ -71,7 +73,9 @@ class MatchSentListView(generics.ListAPIView):
             AIMatchResult.objects.filter(status_owner=self.request.user)
             .exclude(match_status=AIMatchResult.MatchStatus.EXPIRED)
             .select_related(
-                "matched_user", "matched_user__profile", "status",
+                "matched_user",
+                "matched_user__profile",
+                "status",
                 "status_owner",
             )
         )
@@ -119,10 +123,12 @@ class GenerateProfileTagsView(APIView):
     def post(self, request):
         profile = request.user.profile
         generate_profile_tags.delay(str(profile.id))
-        return Response({
-            "success": True,
-            "message": "Tag generation queued. Tags will update shortly.",
-        })
+        return Response(
+            {
+                "success": True,
+                "message": "Tag generation queued. Tags will update shortly.",
+            }
+        )
 
 
 # ------------------------------------------------------------------

@@ -77,8 +77,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         _("active"),
         default=True,
         help_text=_(
-            "Designates whether this user should be treated as active. "
-            "Unselect this instead of deleting accounts."
+            "Designates whether this user should be treated as active. " "Unselect this instead of deleting accounts."
         ),
     )
     is_staff = models.BooleanField(
@@ -89,10 +88,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_suspended = models.BooleanField(
         _("suspended"),
         default=False,
-        help_text=_(
-            "Suspended users cannot log in or interact with the platform. "
-            "Set by moderation actions."
-        ),
+        help_text=_("Suspended users cannot log in or interact with the platform. " "Set by moderation actions."),
     )
 
     # Timestamps

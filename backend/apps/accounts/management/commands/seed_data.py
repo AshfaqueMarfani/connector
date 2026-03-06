@@ -57,24 +57,42 @@ class Command(BaseCommand):
             User.objects.filter(email__endswith="@seed.connector.dev").delete()
             self.stdout.write(self.style.SUCCESS("Seed data cleared."))
 
-        self.stdout.write(
-            f"Seeding {count} users around {city.title()} "
-            f"({center_lat}, {center_lon})..."
-        )
+        self.stdout.write(f"Seeding {count} users around {city.title()} " f"({center_lat}, {center_lon})...")
 
         # Sample data pools
         individual_skills = [
-            "plumbing", "electrician", "tutoring", "cooking",
-            "carpentry", "driving", "translation", "first aid",
-            "photography", "web design", "tailoring", "gardening",
+            "plumbing",
+            "electrician",
+            "tutoring",
+            "cooking",
+            "carpentry",
+            "driving",
+            "translation",
+            "first aid",
+            "photography",
+            "web design",
+            "tailoring",
+            "gardening",
         ]
         ngo_tags = [
-            "food", "shelter", "medical", "education", "legal aid",
-            "clothing", "counseling", "disaster relief",
+            "food",
+            "shelter",
+            "medical",
+            "education",
+            "legal aid",
+            "clothing",
+            "counseling",
+            "disaster relief",
         ]
         business_tags = [
-            "restaurant", "hardware store", "pharmacy", "grocery",
-            "clinic", "salon", "auto repair", "laundry",
+            "restaurant",
+            "hardware store",
+            "pharmacy",
+            "grocery",
+            "clinic",
+            "salon",
+            "auto repair",
+            "laundry",
         ]
         needs = [
             "Need emergency food assistance for family of 4",
@@ -129,9 +147,7 @@ class Command(BaseCommand):
                 # Update profile
                 profile = user.profile
                 if account_type == "individual":
-                    profile.skills = random.sample(
-                        individual_skills, k=random.randint(1, 4)
-                    )
+                    profile.skills = random.sample(individual_skills, k=random.randint(1, 4))
                     profile.interests = random.sample(ngo_tags, k=random.randint(1, 3))
                 elif account_type == "business":
                     profile.tags = random.sample(business_tags, k=random.randint(1, 3))
@@ -183,12 +199,6 @@ class Command(BaseCommand):
                 self.stdout.write(f"  Created: {email} ({account_type})")
 
             except Exception as e:
-                self.stdout.write(
-                    self.style.ERROR(f"  Failed to create {email}: {e}")
-                )
+                self.stdout.write(self.style.ERROR(f"  Failed to create {email}: {e}"))
 
-        self.stdout.write(
-            self.style.SUCCESS(
-                f"\nDone! Created {created_count} seed users around {city.title()}."
-            )
-        )
+        self.stdout.write(self.style.SUCCESS(f"\nDone! Created {created_count} seed users around {city.title()}."))

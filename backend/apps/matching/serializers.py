@@ -59,7 +59,9 @@ class DataIngestionRequestSerializer(serializers.Serializer):
     """Validates incoming data ingestion request."""
 
     source_name = serializers.CharField(
-        max_length=255, required=False, default="API Upload",
+        max_length=255,
+        required=False,
+        default="API Upload",
     )
     entities = serializers.ListField(
         child=serializers.DictField(),
@@ -72,9 +74,7 @@ class DataIngestionRequestSerializer(serializers.Serializer):
         """Each entity must have a ``name`` field."""
         for i, entity in enumerate(value):
             if "name" not in entity:
-                raise serializers.ValidationError(
-                    f"Entity at index {i} missing required field 'name'."
-                )
+                raise serializers.ValidationError(f"Entity at index {i} missing required field 'name'.")
         return value
 
 
@@ -82,7 +82,9 @@ class DataIngestionJobSerializer(serializers.ModelSerializer):
     """Serializer for data ingestion job records."""
 
     initiated_by_email = serializers.EmailField(
-        source="initiated_by.email", read_only=True, default=None,
+        source="initiated_by.email",
+        read_only=True,
+        default=None,
     )
 
     class Meta:

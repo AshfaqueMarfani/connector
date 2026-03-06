@@ -41,16 +41,12 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
     def validate_eula_accepted(self, value):
         if not value:
-            raise serializers.ValidationError(
-                "You must accept the End User License Agreement to create an account."
-            )
+            raise serializers.ValidationError("You must accept the End User License Agreement to create an account.")
         return value
 
     def validate(self, attrs):
         if attrs["password"] != attrs["password_confirm"]:
-            raise serializers.ValidationError(
-                {"password_confirm": "Passwords do not match."}
-            )
+            raise serializers.ValidationError({"password_confirm": "Passwords do not match."})
         return attrs
 
     def create(self, validated_data):

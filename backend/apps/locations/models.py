@@ -59,10 +59,7 @@ class UserLocation(models.Model):
         _("exact location"),
         srid=4326,
         geography=True,
-        help_text=_(
-            "The user's real GPS position. NEVER exposed publicly for "
-            "private/individual profiles."
-        ),
+        help_text=_("The user's real GPS position. NEVER exposed publicly for " "private/individual profiles."),
     )
     obfuscated_point = gis_models.PointField(
         _("obfuscated location"),
@@ -121,10 +118,7 @@ class UserLocation(models.Model):
         ]
 
     def __str__(self):
-        return (
-            f"Location for {self.user.email}: "
-            f"({self.point.y:.6f}, {self.point.x:.6f})"
-        )
+        return f"Location for {self.user.email}: " f"({self.point.y:.6f}, {self.point.x:.6f})"
 
     # ── Obfuscation Logic ────────────────────────────────────────────
 
@@ -171,8 +165,7 @@ class UserLocation(models.Model):
 
         # Destination latitude
         new_lat = math.asin(
-            math.sin(lat) * math.cos(angular_distance)
-            + math.cos(lat) * math.sin(angular_distance) * math.cos(bearing)
+            math.sin(lat) * math.cos(angular_distance) + math.cos(lat) * math.sin(angular_distance) * math.cos(bearing)
         )
 
         # Destination longitude
@@ -238,9 +231,7 @@ class UserLocation(models.Model):
             )
 
         except Exception:
-            logger.exception(
-                "Failed to update location for user %s", self.user.email
-            )
+            logger.exception("Failed to update location for user %s", self.user.email)
             raise
 
 
@@ -268,8 +259,7 @@ class LocationHistory(models.Model):
         srid=4326,
         geography=True,
         help_text=_(
-            "For private profiles this is the OBFUSCATED point. "
-            "For public entities this is the exact point."
+            "For private profiles this is the OBFUSCATED point. " "For public entities this is the exact point."
         ),
     )
     source = models.CharField(
@@ -291,7 +281,4 @@ class LocationHistory(models.Model):
         ]
 
     def __str__(self):
-        return (
-            f"History for {self.user.email} at "
-            f"{self.recorded_at.isoformat()}"
-        )
+        return f"History for {self.user.email} at " f"{self.recorded_at.isoformat()}"
