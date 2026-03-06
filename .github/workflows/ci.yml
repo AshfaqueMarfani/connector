@@ -79,7 +79,7 @@ jobs:
         run: black --check apps/ connector_backend/ --line-length=120 --exclude=migrations
 
       - name: Run import sort check (isort)
-        run: isort --check-only apps/ connector_backend/ --skip migrations
+        run: isort --check-only apps/ connector_backend/ --skip migrations --profile black --line-length 120
 
       - name: Run Django test suite
         env:
