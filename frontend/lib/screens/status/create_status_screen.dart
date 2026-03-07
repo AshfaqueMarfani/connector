@@ -68,11 +68,11 @@ class _CreateStatusScreenState extends State<CreateStatusScreen> {
                   margin: const EdgeInsets.only(bottom: 16),
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: AppTheme.errorColor.withOpacity(0.1),
+                    color: AppTheme.errorColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(provider.error!,
-                      style: TextStyle(color: AppTheme.errorColor)),
+                      style: const TextStyle(color: AppTheme.errorColor)),
                 ),
 
               // Type selector
@@ -111,7 +111,7 @@ class _CreateStatusScreenState extends State<CreateStatusScreen> {
                 ),
                 validator: (v) {
                   if (v == null || v.trim().isEmpty) {
-                    return 'Please describe your ${_statusType}.';
+                    return 'Please describe your $_statusType.';
                   }
                   if (v.trim().length < 5) {
                     return 'Must be at least 5 characters.';
@@ -131,7 +131,7 @@ class _CreateStatusScreenState extends State<CreateStatusScreen> {
                           label: Text(u[0].toUpperCase() + u.substring(1)),
                           selected: _urgency == u,
                           selectedColor:
-                              AppTheme.urgencyColor(u).withOpacity(0.25),
+                              AppTheme.urgencyColor(u).withValues(alpha: 0.25),
                           onSelected: (_) =>
                               setState(() => _urgency = u),
                         ))

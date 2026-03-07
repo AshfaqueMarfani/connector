@@ -8,6 +8,7 @@ import 'auth_provider.dart';
 /// Manages block and report functionality.
 class ModerationProvider extends ChangeNotifier {
   final ApiClient _api = ApiClient();
+  // ignore: unused_field
   AuthProvider? _auth;
 
   void updateAuth(AuthProvider auth) => _auth = auth;

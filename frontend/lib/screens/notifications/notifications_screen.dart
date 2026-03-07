@@ -134,11 +134,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           color: notif.isRead
                               ? null
                               : theme.colorScheme.primary
-                                  .withOpacity(0.05),
+                                  .withValues(alpha: 0.05),
                           child: ListTile(
                             leading: CircleAvatar(
                               backgroundColor:
-                                  typeColor.withOpacity(0.15),
+                                  typeColor.withValues(alpha: 0.15),
                               child: Icon(
                                 _iconForType(notif.notificationType),
                                 color: typeColor,

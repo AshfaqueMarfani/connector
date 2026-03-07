@@ -250,7 +250,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 onPressed: () async {
                   final success =
                       await context.read<ProfileProvider>().generateAiTags();
-                  if (mounted) {
+                  if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content: Text(success
                           ? 'AI tag generation queued. Refresh shortly.'

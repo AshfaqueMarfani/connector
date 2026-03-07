@@ -64,7 +64,7 @@ class SettingsScreen extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: AppTheme.accountTypeColor(
                                     auth.user!.accountType)
-                                .withOpacity(0.15),
+                                .withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
@@ -91,7 +91,7 @@ class SettingsScreen extends StatelessWidget {
           const Divider(height: 1),
 
           // Profile section
-          _SectionHeader(title: 'Profile'),
+          const _SectionHeader(title: 'Profile'),
           ListTile(
             leading: const Icon(Icons.person_outline),
             title: const Text('Edit Profile'),
@@ -110,7 +110,7 @@ class SettingsScreen extends StatelessWidget {
           const Divider(height: 1),
 
           // Location & Privacy
-          _SectionHeader(title: 'Location & Privacy'),
+          const _SectionHeader(title: 'Location & Privacy'),
           SwitchListTile(
             secondary: const Icon(Icons.location_on_outlined),
             title: const Text('Live Tracking'),
@@ -148,7 +148,7 @@ class SettingsScreen extends StatelessWidget {
           const Divider(height: 1),
 
           // Moderation
-          _SectionHeader(title: 'Safety'),
+          const _SectionHeader(title: 'Safety'),
           ListTile(
             leading: const Icon(Icons.block),
             title: const Text('Blocked Users'),
@@ -159,7 +159,7 @@ class SettingsScreen extends StatelessWidget {
           const Divider(height: 1),
 
           // Account
-          _SectionHeader(title: 'Account'),
+          const _SectionHeader(title: 'Account'),
           ListTile(
             leading: const Icon(Icons.info_outline),
             title: const Text('About Connector'),
@@ -174,8 +174,8 @@ class SettingsScreen extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: Icon(Icons.logout, color: AppTheme.errorColor),
-            title: Text('Log Out',
+            leading: const Icon(Icons.logout, color: AppTheme.errorColor),
+            title: const Text('Log Out',
                 style: TextStyle(color: AppTheme.errorColor)),
             onTap: () => _confirmLogout(context),
           ),

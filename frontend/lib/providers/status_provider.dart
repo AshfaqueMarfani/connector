@@ -9,6 +9,7 @@ import 'auth_provider.dart';
 /// Manages user status broadcasts (needs & offers).
 class StatusProvider extends ChangeNotifier {
   final ApiClient _api = ApiClient();
+  // ignore: unused_field
   AuthProvider? _auth;
 
   void updateAuth(AuthProvider auth) => _auth = auth;

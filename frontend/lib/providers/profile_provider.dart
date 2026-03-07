@@ -9,6 +9,7 @@ import 'auth_provider.dart';
 /// Manages user profile data: fetch, update, view other profiles.
 class ProfileProvider extends ChangeNotifier {
   final ApiClient _api = ApiClient();
+  // ignore: unused_field
   AuthProvider? _auth;
 
   void updateAuth(AuthProvider auth) => _auth = auth;

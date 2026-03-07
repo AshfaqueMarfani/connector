@@ -19,6 +19,7 @@ class ChatProvider extends ChangeNotifier {
   bool _isLoading = false;
   String? _error;
   WsClient? _wsClient;
+  // ignore: unused_field
   String? _activeRoomId;
   bool _isOtherTyping = false;
 

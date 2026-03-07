@@ -125,9 +125,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               myLocation.latitude, myLocation.longitude),
                           radius: locationProvider.searchRadius.toDouble(),
                           useRadiusInMeter: true,
-                          color: AppTheme.primaryColor.withOpacity(0.08),
+                          color: AppTheme.primaryColor.withValues(alpha: 0.08),
                           borderColor:
-                              AppTheme.primaryColor.withOpacity(0.3),
+                              AppTheme.primaryColor.withValues(alpha: 0.3),
                           borderStrokeWidth: 2,
                         ),
                       ]),
@@ -147,7 +147,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   color: Colors.white, width: 3),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
+                                  color: Colors.black.withValues(alpha: 0.2),
                                   blurRadius: 6,
                                 ),
                               ],
@@ -176,7 +176,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     color: Colors.white, width: 2),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: color.withOpacity(0.4),
+                                    color: color.withValues(alpha: 0.4),
                                     blurRadius: 4,
                                   ),
                                 ],
@@ -214,11 +214,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       color: Theme.of(context)
                           .colorScheme
                           .surface
-                          .withOpacity(0.9),
+                          .withValues(alpha: 0.9),
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
+                          color: Colors.black.withValues(alpha: 0.1),
                           blurRadius: 8,
                         ),
                       ],
@@ -288,7 +288,7 @@ class _HomeScreenState extends State<HomeScreen> {
       label: Text(label),
       selected: isSelected,
       onSelected: (_) => _onFilterChanged(type),
-      selectedColor: AppTheme.primaryColor.withOpacity(0.15),
+      selectedColor: AppTheme.primaryColor.withValues(alpha: 0.15),
       checkmarkColor: AppTheme.primaryColor,
     );
   }

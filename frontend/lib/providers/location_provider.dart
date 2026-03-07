@@ -10,6 +10,7 @@ import 'auth_provider.dart';
 /// Manages device location, GPS permissions, nearby search.
 class LocationProvider extends ChangeNotifier {
   final ApiClient _api = ApiClient();
+  // ignore: unused_field
   AuthProvider? _auth;
 
   void updateAuth(AuthProvider auth) => _auth = auth;

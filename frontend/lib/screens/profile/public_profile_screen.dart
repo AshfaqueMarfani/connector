@@ -197,7 +197,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(_error!,
-                          style: TextStyle(color: AppTheme.errorColor)),
+                          style: const TextStyle(color: AppTheme.errorColor)),
                       const SizedBox(height: 8),
                       OutlinedButton(
                           onPressed: _load, child: const Text('Retry')),

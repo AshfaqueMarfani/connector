@@ -98,7 +98,7 @@ class _StatusCard extends StatelessWidget {
                       horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
                     color: (isNeed ? Colors.orange : Colors.teal)
-                        .withOpacity(0.15),
+                        .withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Row(
@@ -131,7 +131,7 @@ class _StatusCard extends StatelessWidget {
                       horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
                     color: AppTheme.urgencyColor(status.urgency)
-                        .withOpacity(0.15),
+                        .withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
@@ -157,7 +157,7 @@ class _StatusCard extends StatelessWidget {
                     ),
                   ),
                   backgroundColor: isActive
-                      ? AppTheme.successColor.withOpacity(0.1)
+                      ? AppTheme.successColor.withValues(alpha: 0.1)
                       : theme.colorScheme.surfaceContainerHighest,
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   visualDensity: VisualDensity.compact,
