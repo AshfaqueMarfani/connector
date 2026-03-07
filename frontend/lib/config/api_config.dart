@@ -12,7 +12,7 @@ class ApiConfig {
   );
 
   // ── Production ───────────────────────────────────────────
-  static const String _productionHost = 'api.social.otaskflow.com';
+  static const String _productionHost = 'social.otaskflow.com';
   static const String _productionScheme = 'https';
   static const String _productionWsScheme = 'wss';
 

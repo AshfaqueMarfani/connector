@@ -276,6 +276,11 @@ CORS_ALLOWED_ORIGINS = env.list(
     default=["http://localhost:3000", "http://127.0.0.1:3000"],
 )
 CORS_ALLOW_CREDENTIALS = True
+# Allow any localhost port in development (Flutter web uses random ports)
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^http://localhost:\d+$",
+    r"^http://127\.0\.0\.1:\d+$",
+]
 
 # ---------------------------------------------------------------------------
 # SECURITY (hardened for production; relaxed via DEBUG in dev)
